@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\EventNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 
 class EventController extends Controller
@@ -21,6 +22,7 @@ class EventController extends Controller
     public function createEvent(Request $request)
     {
         $validated = $request->validate([
+            'user_id'=>'required|exists:users,id',
             'class' => 'required',
             'level' => 'required',
             'category' => 'required',
@@ -36,16 +38,17 @@ class EventController extends Controller
         ]);
 
         try {
-            //  // Create the event
-            //  $event = Event::create($validated);
-            
-            // Create the event and link it to the authenticated user
+            Log::info('Auth ID when creating event: ', ['user_id' => Auth::id()]);
+
+           // Create the event and link it to the authenticated user
             $event = Event::create(array_merge($validated, ['user_id' => Auth::id()]));
 
             // Find users who are interested in this event's category (no longer using classifications table)
-            $users = User::whereHas('preferences', function ($query) use ($event) {
-                $query->where('category', $event->category);  // Adjust according to the correct attribute
-            })->get();
+            $users = User::all();
+
+            // whereHas('preferences', function ($query) use ($event) {
+            //     $query->where('category', $event->category);  // Adjust according to the correct attribute
+            // })->get();
 
             // // // Send notifications to the relevant users
             foreach ($users as $user) {
@@ -86,6 +89,7 @@ class EventController extends Controller
     public function updateEvent(Request $request, $id)
     {
         $request->validate([
+            'user_id'=>'required|exists:users,id',
             'class' => 'required',
             'level' => 'required',
             'category' => 'required',
