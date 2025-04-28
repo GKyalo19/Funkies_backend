@@ -26,7 +26,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
             'role_id' => ['required', 'exists:roles,id'],
         ]);
 
@@ -64,7 +64,7 @@ class UserController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['sometimes', 'string', 'min:8'],
-            'user_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
             'role_id' => ['sometimes', 'exists:roles,id'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
