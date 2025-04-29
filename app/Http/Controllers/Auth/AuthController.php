@@ -57,7 +57,7 @@ class AuthController extends Controller
     $validated['password'] = Hash::make($validated['password']);
 
     // Assign a default role for new registrations
-    $validated['role_id'] = Role::where('name', 'user')->first()->id; // or whatever default role
+    // $validated['role_id'] = Role::where('name', 'user')->first()->id; // or whatever default role
 
     if ($request->hasFile('user_photo')) {
         $filename = $request->file('user_photo')->store('users', 'public');
