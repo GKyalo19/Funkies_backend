@@ -27,7 +27,7 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
             'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'role_id' => ['required', 'exists:roles,id'],
+            // 'role_id' => ['required', 'exists:roles,id'],
         ]);
 
         if ($request->hasFile('user_photo')) {
@@ -65,7 +65,7 @@ class UserController extends Controller
             'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['sometimes', 'string', 'min:8'],
             'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'role_id' => ['sometimes', 'exists:roles,id'],
+            // 'role_id' => ['sometimes', 'exists:roles,id'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
