@@ -50,7 +50,7 @@ class AuthController extends Controller
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'password' => ['required', 'string', 'min:8', 'confirmed'],
-        'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+        // 'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
         // Remove role_id from public registration
     ]);
 
@@ -59,13 +59,13 @@ class AuthController extends Controller
     // Assign a default role for new registrations
     // $validated['role_id'] = Role::where('name', 'user')->first()->id; // or whatever default role
 
-    if ($request->hasFile('user_photo')) {
-        $filename = $request->file('user_photo')->store('users', 'public');
-    } else {
-        $filename = Null;
-    }
+    // if ($request->hasFile('user_photo')) {
+    //     $filename = $request->file('user_photo')->store('users', 'public');
+    // } else {
+    //     $filename = Null;
+    // }
 
-    $validated['user_photo'] = $filename;
+    // $validated['user_photo'] = $filename;
 
     //createUser
     $user = User::create($validated);
