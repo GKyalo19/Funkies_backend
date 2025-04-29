@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -75,7 +74,7 @@ class AuthController extends Controller
 
     return response()->json([
         'message' => 'Registration successful',
-        'user' => $user->load('role'),
+        'user' => $user,
         'token' => $token
     ], 201);
 }
@@ -110,7 +109,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user->load('role'),
+            'user' => $user,
             'abilities' => $user->abilities(),
         ]);
     }
@@ -126,7 +125,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => $request->user()->load('role'),
+            'user' => $request->user(),
             'abilities' => $request->user()->abilities(),
         ]);
     }
