@@ -111,7 +111,7 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
             // 'abilities' => $user->abilities(),
-        ]);
+        ], 201);
     }
 
     //LOGOUT
