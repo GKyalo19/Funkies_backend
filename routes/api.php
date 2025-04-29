@@ -34,13 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('user/{id}', [UserController::class, 'update']);
     Route::delete('user/{id}',[UserController::class, 'destroy']);
 
-    // Roles
-    Route::post('role', [RoleController::class, 'createRole']);
-    Route::get('role', [RoleController::class, 'index']);
-    Route::get('role/{id}', [RoleController::class, 'getRole']);
-    Route::put('role/{id}', [RoleController::class, 'updateRole']);
-    Route::delete('role/{id}', [RoleController::class, 'deleteRole']);
-
     // Events
     Route::get('event', [EventController::class, 'getEvents']);
     Route::post('event', [EventController::class, 'createEvent']);
@@ -56,6 +49,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('gallery/{id}', [GalleryController::class, 'updateGallery']);
     Route::delete('gallery/{id}', [GalleryController::class, 'deleteGallery']);
 });
+
+// Roles
+Route::post('role', [RoleController::class, 'createRole']);
+Route::get('role', [RoleController::class, 'index']);
+Route::get('role/{id}', [RoleController::class, 'getRole']);
+Route::put('role/{id}', [RoleController::class, 'updateRole']);
+Route::delete('role/{id}', [RoleController::class, 'deleteRole']);
+
+
 
 
 // Route::group(function () {
