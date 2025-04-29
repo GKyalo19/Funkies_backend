@@ -110,7 +110,7 @@ class AuthController extends Controller
         return response()->json([
             'token' => $token,
             'user' => $user,
-            'abilities' => $user->abilities(),
+            // 'abilities' => $user->abilities(),
         ]);
     }
 
