@@ -86,7 +86,7 @@ class EventController extends Controller
         }
     }
 
-    public function updateEvent(Request $request, $id)
+    public function editEvent(Request $request, $id)
     {
         $request->validate([
             'user_id'=>'required|exists:users,id',
