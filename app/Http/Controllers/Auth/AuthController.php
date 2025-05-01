@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -35,7 +37,7 @@ class AuthController extends Controller
      * -
      */
 
-     /**
+    /**
      * LOGOUT
      * - delete token
      */
@@ -43,41 +45,45 @@ class AuthController extends Controller
 
     // REGISTER
     public function register(Request $request): JsonResponse
-{
-    // validation
-    $validated = $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'password' => ['required', 'string', 'min:8', 'confirmed'],
-        // 'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
-        // Remove role_id from public registration
-    ]);
+    {
+        // validation
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // 'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
+            // Remove role_id from public registration
+        ]);
 
-    $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make($validated['password']);
 
-    // Assign a default role for new registrations
-    // $validated['role_id'] = Role::where('name', 'user')->first()->id; // or whatever default role
+        // Assign a default role for new registrations
+        // $validated['role_id'] = Role::where('name', 'user')->first()->id; // or whatever default role
 
-    // if ($request->hasFile('user_photo')) {
-    //     $filename = $request->file('user_photo')->store('users', 'public');
-    // } else {
-    //     $filename = Null;
-    // }
+        // if ($request->hasFile('user_photo')) {
+        //     $filename = $request->file('user_photo')->store('users', 'public');
+        // } else {
+        //     $filename = Null;
+        // }
 
-    // $validated['user_photo'] = $filename;
+        // $validated['user_photo'] = $filename;
 
-    //createUser
-    $user = User::create($validated);
+        //createUser
+        $user = User::create($validated);
 
-    // Optionally create token for the user
-    $token = $user->createToken('auth-token')->plainTextToken;
+        // Optionally create token for the user
+        $token = $user->createToken('auth-token')->plainTextToken;
 
-    return response()->json([
-        'message' => 'Registration successful',
-        'user' => $user,
-        'token' => $token
-    ], 201);
-}
+        //Welcome email
+        $userEmail = $validated['email'];
+        Mail::to($userEmail)->send(new WelcomeEmail());
+
+        return response()->json([
+            'message' => 'Registration successful and confirmation email sent',
+            'user' => $user,
+            'token' => $token
+        ], 201);
+    }
 
     //LOGIN
     public function login(Request $request): JsonResponse
@@ -126,7 +132,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'user' => $request->user(),
-            'abilities' => $request->user()->abilities(),
+            // 'abilities' => $request->user()->abilities(),
         ]);
     }
 }
