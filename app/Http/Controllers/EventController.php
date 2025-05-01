@@ -47,11 +47,11 @@ class EventController extends Controller
             $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
 
             //Notify all users
-            $users = User::all();
+            // $users = User::all();
 
-            foreach ($users as $user) {
-                $user->notify(new EventNotification($event));
-            }
+            // foreach ($users as $user) {
+            //     $user->notify(new EventNotification($event));
+            // }
 
             Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
 
