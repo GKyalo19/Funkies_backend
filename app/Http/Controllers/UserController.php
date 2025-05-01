@@ -58,7 +58,7 @@ class UserController extends Controller
         return response()->json($userData);
     }
 
-    public function getRole($id){
+    public function getUser($id){
 
             $fetchedUser = User::findOrFail($id);
 
