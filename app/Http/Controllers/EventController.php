@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EventCreatedConfirmation;
 use App\Models\Event;
 use App\Models\User;
 use App\Notifications\EventNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
 
 class EventController extends Controller
 {
@@ -22,8 +23,8 @@ class EventController extends Controller
     public function createEvent(Request $request)
     {
         $validated = $request->validate([
-            'user_id'=>'required|exists:users,id',
-            'class' => 'required',
+            'user_id'=>'exists:users,id',
+            'eventClass' => 'required',
             'level' => 'required',
             'category' => 'required',
             'subject' => 'nullable',
@@ -38,25 +39,26 @@ class EventController extends Controller
         ]);
 
         try {
-            Log::info('Auth ID when creating event: ', ['user_id' => Auth::id()]);
+            $authUser = Auth::user();
+
+            Log::info('Auth ID when creating event: ', ['user_id' => $authUser->id]);
 
            // Create the event and link it to the authenticated user
-            $event = Event::create(array_merge($validated, ['user_id' => Auth::id()]));
+            $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
 
-            // Find users who are interested in this event's category (no longer using classifications table)
+            //Notify all users
             $users = User::all();
 
-            // whereHas('preferences', function ($query) use ($event) {
-            //     $query->where('category', $event->category);  // Adjust according to the correct attribute
-            // })->get();
-
-            // // // Send notifications to the relevant users
             foreach ($users as $user) {
                 $user->notify(new EventNotification($event));
             }
 
+            Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
+
             return response()->json(['message' => 'Event created and notifications sent!'], 201);
         } catch (\Exception $e) {
+            Log::error('Event creation failed: ' . $e->getMessage());
+
             return response()->json([
                 'message' => 'Failed to create event',
                 'error' => $e->getMessage()
@@ -90,7 +92,7 @@ class EventController extends Controller
     {
         $request->validate([
             'user_id'=>'required|exists:users,id',
-            'class' => 'required',
+            'eventClass' => 'required',
             'level' => 'required',
             'category' => 'required',
             'subject' => 'nullable',

@@ -10,7 +10,7 @@ class Event extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'class',
+        'eventClass',
         'level',
         'category',
         'subject',
