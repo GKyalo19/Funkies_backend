@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 
@@ -74,12 +75,18 @@ class UserController extends Controller
     {
         $userToUpdate = User::findOrFail($id);
 
+        Log::info($userToUpdate);
+
         try {
             $validated = $request->validate([
                 'name' => ['sometimes', 'string', 'max:255'],
                 'email' => ['sometimes', 'string', 'email', 'max:255'],
                 'password' => ['sometimes', 'string', 'min:8'],
             ]);
+
+            $userToUpdate->fill($validated);
+
+            Log::info($validated);
 
             if (isset($validated['name'])) {
                 $userToUpdate->name = $validated['name'];
@@ -93,6 +100,7 @@ class UserController extends Controller
                 $userToUpdate->password = Hash::make($validated['password']);
             }
 
+            Log::info($userToUpdate);
             $userToUpdate->save();
 
             return response()->json([
