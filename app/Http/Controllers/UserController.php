@@ -58,17 +58,17 @@ class UserController extends Controller
         return response()->json($userData);
     }
 
-    public function getUser($id){
+    public function getUser($id)
+    {
 
-            $fetchedUser = User::findOrFail($id);
+        $fetchedUser = User::findOrFail($id);
 
-            if ($fetchedUser -> count()>0){
-                return response()->json([$fetchedUser], 200);
-            }
-            else {
-                return "User was not Found for ID: `$id`";
-            }
+        if ($fetchedUser->count() > 0) {
+            return response()->json([$fetchedUser], 200);
+        } else {
+            return "User was not Found for ID: $id";
         }
+    }
 
     public function updateUser(Request $request, $id)
     {
@@ -86,8 +86,7 @@ class UserController extends Controller
             $userToUpdate->email = $validated['email'];
             $userToUpdate->password = $validated['password'];
 
-        $userToUpdate['password'] = Hash::make($userToUpdate['password']);
-
+            $userToUpdate['password'] = Hash::make($userToUpdate['password']);
         }
 
         try {
@@ -100,7 +99,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 "Error" => "Error updating user",
-                "Message"=>$e->getMessage()
+                "Message" => $e->getMessage()
             ], 400);                             //If you see this error it means createRole() is failing
         }
     }
@@ -122,6 +121,18 @@ class UserController extends Controller
         } else {
             return "User not found";
         }
+    }
+
+    public function restoreUser($email)
+    {
+        $user = User::withTrashed()->where('email', $email)->first();
+
+        if ($user && $user->trashed()) {
+            $user->restore();
+            return response()->json(['message' => 'User restored successfully.']);
+        }
+
+        return response()->json(['message' => 'User not found or not deleted.'], 404);
     }
 }
 
