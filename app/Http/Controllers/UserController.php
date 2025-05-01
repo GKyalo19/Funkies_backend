@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -44,11 +45,11 @@ class UserController extends Controller
         return response()->json($user->load('role'), 201);
     }
 
-    public function show(User $user): JsonResponse
+    public function showUsers(User $user): JsonResponse
     {
-        $this->authorize('view', $user);
+        // $this->authorize('view', $user);
         // Load the relationship and get the user data
-        $userData = $user->load('role')->toArray();
+        $userData = $user;
 
         // $userData['user_photo_url'] = $user->user_photo
         //     ?asset('storage/' . $user->user_photo)
@@ -57,7 +58,7 @@ class UserController extends Controller
         return response()->json($userData);
     }
 
-    public function update(Request $request, $id)
+    public function updateUser(Request $request, $id)
     {
         $userToUpdate = User::findOrFail($id);
 
@@ -68,40 +69,47 @@ class UserController extends Controller
             'password' => ['sometimes', 'string', 'min:8'],
         ]);
 
-        if($userToUpdate){
+        if ($userToUpdate) {
             $userToUpdate->name = $validated['name'];
             $userToUpdate->email = $validated['email'];
             $userToUpdate->password = $validated['password'];
+
+        $userToUpdate['password'] = Hash::make($userToUpdate['password']);
+
         }
 
-        try{
-            $updatedUser = $userToUpdate -> save();
-            if ($updatedUser){
-                return response ()->json($updatedUser);
-            }
-            else {
+        try {
+            $updatedUser = $userToUpdate->save();
+            if ($updatedUser) {
+                return response()->json($updatedUser);
+            } else {
                 return "User not Updated";
             }
-        }
-        catch (\Exception $e) {
-            return response()-> json ([
-                "Error"=>"Error creating a role"
-            ],500 );                             //If you see this error it means createRole() is failing
+        } catch (\Exception $e) {
+            return response()->json([
+                "Error" => "Error updating user",
+                "Message"=>$e->getMessage()
+            ], 400);                             //If you see this error it means createRole() is failing
         }
     }
 
-    //     if (isset($validated['password'])) {
-    //         $validated['password'] = Hash::make($validated['password']);
-    //     }
-    //     $user->update($validated);
-    //     return response()->json($user->load('role'));
-    // }
-
-    public function destroy(User $user): JsonResponse
+    public function deleteUser($id)
     {
-        // $this->authorize('delete', $user);
-        $user->delete();
-        return response()->json(null, 204);
+        $userToDelete = User::findorFail($id);
+
+        if ($userToDelete) {
+            try {
+                $userToDelete = User::destroy($id);
+                return "User deleted successfully";
+            } catch (Exception $e) {
+                return response()->json([
+                    "Error" => "Failed to delete user",
+                    "Message" => $e->getMessage()
+                ], 500);
+            }
+        } else {
+            return "User not found";
+        }
     }
 }
 

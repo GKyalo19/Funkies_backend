@@ -30,9 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::get('user', [UserController::class, 'index']);
     Route::post('user', [UserController::class, 'store']);
-    Route::get('user/{id}', [UserController::class, 'show']);
-    Route::put('user/{id}', [UserController::class, 'update']);
-    Route::delete('user/{id}',[UserController::class, 'destroy']);
+    Route::get('user/{id}', [UserController::class, 'showUsers']);
+    Route::put('user/{id}', [UserController::class, 'updateUser']);
+    Route::delete('user/{id}',[UserController::class, 'deleteUser']);
 
     // Events
     Route::get('event', [EventController::class, 'getEvents']);
