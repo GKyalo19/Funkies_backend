@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeEmail;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -74,15 +75,24 @@ class AuthController extends Controller
         // Optionally create token for the user
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        //Welcome email
-        $userEmail = $validated['email'];
-        Mail::to($userEmail)->send(new WelcomeEmail());
+        try {
+            //Welcome email
+            $userEmail = $validated['email'];
+            Mail::to($userEmail)->send(new WelcomeEmail());
 
-        return response()->json([
-            'message' => 'Registration successful and confirmation email sent',
-            'user' => $user,
-            'token' => $token
-        ], 201);
+            return response()->json([
+                'message' => 'Registration successful and confirmation email sent',
+                'user' => $user,
+                'token' => $token
+            ], 201);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Registration successful but email failed to send',
+                'user' => $user,
+                'token' => $token
+            ], 404);
+        }
     }
 
     //LOGIN
