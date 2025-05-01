@@ -58,6 +58,18 @@ class UserController extends Controller
         return response()->json($userData);
     }
 
+    public function getRole($id){
+
+            $fetchedUser = User::findOrFail($id);
+
+            if ($fetchedUser -> count()>0){
+                return response()->json([$fetchedUser], 200);
+            }
+            else {
+                return "User was not Found for ID: `$id`";
+            }
+        }
+
     public function updateUser(Request $request, $id)
     {
         $userToUpdate = User::findOrFail($id);
