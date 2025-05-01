@@ -7,6 +7,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -59,6 +60,10 @@ Route::get('role/{id}', [RoleController::class, 'getRole']);
 Route::put('role/{id}', [RoleController::class, 'updateRole']);
 Route::delete('role/{id}', [RoleController::class, 'deleteRole']);
 
+Route::get('/test-email', function () {
+    Mail::to('your-email@example.com')->send(new \App\Mail\WelcomeEmail());
+    return "Email sent!";
+});
 
 
 
