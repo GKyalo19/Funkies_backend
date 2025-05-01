@@ -74,35 +74,39 @@ class UserController extends Controller
     {
         $userToUpdate = User::findOrFail($id);
 
-        // $this->authorize('update', $user);
-        $validated = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', 'max:255'],
-            'password' => ['sometimes', 'string', 'min:8'],
-        ]);
-
-        if ($userToUpdate) {
-            $userToUpdate->name = $validated['name'];
-            $userToUpdate->email = $validated['email'];
-            $userToUpdate->password = $validated['password'];
-
-            $userToUpdate['password'] = Hash::make($userToUpdate['password']);
-        }
-
         try {
-            $updatedUser = $userToUpdate->save();
-            if ($updatedUser) {
-                return response()->json($updatedUser);
-            } else {
-                return "User not Updated";
+            $validated = $request->validate([
+                'name' => ['sometimes', 'string', 'max:255'],
+                'email' => ['sometimes', 'string', 'email', 'max:255'],
+                'password' => ['sometimes', 'string', 'min:8'],
+            ]);
+
+            if (isset($validated['name'])) {
+                $userToUpdate->name = $validated['name'];
             }
+
+            if (isset($validated['email'])) {
+                $userToUpdate->email = $validated['email'];
+            }
+
+            if (isset($validated['password'])) {
+                $userToUpdate->password = Hash::make($validated['password']);
+            }
+
+            $userToUpdate->save();
+
+            return response()->json([
+                "message" => "User updated successfully",
+                "user" => $userToUpdate
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                "Error" => "Error updating user",
-                "Message" => $e->getMessage()
-            ], 400);                             //If you see this error it means createRole() is failing
+                "error" => "Error updating user",
+                "message" => $e->getMessage()
+            ], 400);
         }
     }
+
 
     public function deleteUser($id)
     {
