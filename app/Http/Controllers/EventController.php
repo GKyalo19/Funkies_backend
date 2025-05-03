@@ -46,12 +46,12 @@ class EventController extends Controller
            // Create the event and link it to the authenticated user
             $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
 
-            //Notify all users
-            // $users = User::all();
+            // Notify all users
+            $users = User::all();
 
-            // foreach ($users as $user) {
-            //     $user->notify(new EventNotification($event));
-            // }
+            foreach ($users as $user) {
+                $user->notify(new EventNotification($event));
+            }
 
             Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
 
