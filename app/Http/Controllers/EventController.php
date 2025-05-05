@@ -53,7 +53,7 @@ class EventController extends Controller
                 $user->notify(new EventNotification($event));
             }
 
-            Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
+           Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
 
             return response()->json(['message' => 'Event created and notifications sent!'], 201);
         } catch (\Exception $e) {
