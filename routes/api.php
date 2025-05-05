@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -43,6 +44,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('event/{id}', [EventController::class, 'getEvent']);
     Route::put('event/{id}', [EventController::class, 'editEvent']);
     Route::delete('event/{id}', [EventController::class, 'deleteEvent']);
+
+    //Likes
+    Route::post('like/{id}', [LikeController::class, 'likeEvent']);
+    Route::get('like', [LikeController::class, 'getLikedEvents']);
+    Route::delete('like/{id}', [LikeController::class, 'unlikeEvent']);
 
     // Galleries
     Route::get('gallery', [GalleryController::class, 'getGalleries']);

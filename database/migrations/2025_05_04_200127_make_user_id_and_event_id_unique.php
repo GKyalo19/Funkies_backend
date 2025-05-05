@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dateTime('startDate')->change();
-            $table->dateTime('endDate')->change();
+        Schema::table('likes', function(Blueprint $table){
+            $table->unique(['user_id', 'event_id'], 'likes_user_id_event_id_unique');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->date('startDate')->change();
-            $table->date('endDate')->change();
+        Schema::table('likes', function(Blueprint $table){
+            $table->dropUnique(['likes_user_id_event_id_unique']);
         });
     }
 };
