@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
 
 
 class Event extends Model
@@ -32,7 +33,7 @@ class Event extends Model
     }
     public function likedByUsers()
     {
-        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+        return $this->belongsToMany(User::class, 'likes', 'event_id', 'user_id')->withTimestamps();
     }
     protected $casts = [
         'startDate' => 'datetime',

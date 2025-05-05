@@ -4,17 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\Like;
-use Dotenv\Exception\ValidationException;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LikeController extends Controller
 {
-    public function likeEvent(Event $event)
+    public function likeEvent($id)
     {
         try {
             $user = Auth::user();
+
+            $event = Event::findOrFail($id);
 
             if($user->likedEvents()->where('event_id', $event->id)->exists()){
                 return response()->json([
@@ -23,6 +25,9 @@ class LikeController extends Controller
             };
 
             $user->likedEvents()->attach($event->id);
+
+            Log::info('Liking event ID: ' . $event->id . ' for user ID: ' . $user->id);
+
 
             return response()->json([
                 'message' => 'Event liked successfully',
@@ -51,9 +56,11 @@ class LikeController extends Controller
 
     }
 
-    public function unLikeEvent(Event $event){
+    public function unLikeEvent($id){
         try{
             $user = Auth::user();
+
+            $event = Event::findOrFail($id);
 
             $user->likedEvents()->detach($event->id);
             return response()->json([

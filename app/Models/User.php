@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 
+
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable, SoftDeletes;
@@ -32,10 +33,6 @@ class User extends Authenticatable
 
     protected $dates = ['deleted_at'];
 
-    // public function role()
-    // {
-    //     return $this->belongsTo(Role::class);
-    // }
 
     public function events()
     {
@@ -43,7 +40,7 @@ class User extends Authenticatable
     }
     public function likedEvents()
     {
-        return $this->belongsToMany(Event::class, 'likes')->withTimestamps();
+        return $this->belongsToMany(Event::class, 'likes', 'user_id', 'event_id')->withTimestamps();
     }
 
     public function isAdmin(): bool
