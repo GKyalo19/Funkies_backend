@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EventResource;
 use App\Mail\EventCreatedConfirmation;
 use App\Models\Event;
 use App\Models\User;
@@ -15,15 +16,7 @@ class EventController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-
-        $events = Event::all()->map(function ($event) use ($user) {
-            $event->isLiked = $user
-                ? $user->likedEvents()->where('event_id', $event->id)->exists()
-                : false;
-            return $event;
-        });
-        return view('events/event', compact('events'));
+        return EventResource::collection(Event::all());
     }
 
     // Create an Event and Notify Users
