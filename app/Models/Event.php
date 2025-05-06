@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Auth;
 
 class Event extends Model
 {
@@ -40,5 +40,15 @@ class Event extends Model
         'endDate' => 'datetime',
     ];
 
-}
+    protected $appends = ['isLiked'];
 
+    protected $hidden = []; // optionally hide pivot data
+
+    public function getIsLikedAttribute()
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+
+        return $user->likedEvents()->where('event_id', $this->id)->exists();
+    }
+}

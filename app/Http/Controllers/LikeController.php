@@ -45,7 +45,10 @@ class LikeController extends Controller
         $user = Auth::user();
 
         try {
-            $likedEvents = $user->likedEvents()->get();
+            $likedEvents = $user->likedEvents()->get()->map(function ($event){
+                $event -> isLiked = true;
+                return $event;
+            });
             return response()->json($likedEvents);
         } catch(Exception $e) {
             print_r($e);

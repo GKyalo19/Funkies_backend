@@ -15,7 +15,14 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::all();
+        $user = Auth::user();
+
+        $events = Event::all()->map(function ($event) use ($user) {
+            $event->isLiked = $user
+                ? $user->likedEvents()->where('event_id', $event->id)->exists()
+                : false;
+            return $event;
+        });
         return view('events/event', compact('events'));
     }
 
@@ -23,7 +30,7 @@ class EventController extends Controller
     public function createEvent(Request $request)
     {
         $validated = $request->validate([
-            'user_id'=>'exists:users,id',
+            'user_id' => 'exists:users,id',
             'eventClass' => 'required',
             'level' => 'required',
             'category' => 'required',
@@ -43,7 +50,7 @@ class EventController extends Controller
 
             Log::info('Auth ID when creating event: ', ['user_id' => $authUser->id]);
 
-           // Create the event and link it to the authenticated user
+            // Create the event and link it to the authenticated user
             $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
 
             // Notify all users
@@ -53,7 +60,7 @@ class EventController extends Controller
                 $user->notify(new EventNotification($event));
             }
 
-           Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
+            Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
 
             return response()->json(['message' => 'Event created and notifications sent!'], 201);
         } catch (\Exception $e) {
@@ -63,16 +70,6 @@ class EventController extends Controller
                 'message' => 'Failed to create event',
                 'error' => $e->getMessage()
             ], 500);
-        }
-    }
-
-    public function getEvents()
-    {
-        $events = Event::all();
-        if ($events) {
-            return response()->json($events);
-        } else {
-            return response("No event was found");
         }
     }
 
@@ -91,7 +88,7 @@ class EventController extends Controller
     public function editEvent(Request $request, $id)
     {
         $request->validate([
-            'user_id'=>'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
             'eventClass' => 'required',
             'level' => 'required',
             'category' => 'required',

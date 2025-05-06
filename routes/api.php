@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/restore-user/{email}', [UserController::class, 'restoreUser']);
 
     // Events
-    Route::get('event', [EventController::class, 'getEvents']);
+    Route::get('event', [EventController::class, 'index']);
     Route::post('event', [EventController::class, 'createEvent']);
     Route::get('event/{id}', [EventController::class, 'getEvent']);
     Route::put('event/{id}', [EventController::class, 'editEvent']);
