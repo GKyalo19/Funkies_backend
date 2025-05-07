@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -48,6 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('like/{id}', [LikeController::class, 'likeEvent']);
     Route::get('like', [LikeController::class, 'getLikedEvents']);
     Route::delete('unlike/{id}', [LikeController::class, 'unlikeEvent']);
+
+    //MPesa
+    Route::post('token', [MpesaController::class, 'generateAccessToken']);
+    Route::post('stk/push', [MpesaController::class, 'STKPush']);
 
     // Galleries
     Route::get('gallery', [GalleryController::class, 'getGalleries']);
