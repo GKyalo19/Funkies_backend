@@ -32,7 +32,7 @@ class MpesaController extends Controller
     public function STKPush(){
         $BusinessShortCode = 174379;
 
-        $passkey = 'GOsNjC8cyxtA6JM8B0zMMMG3cDE8FebsXvjG3nQeAtDc8fE8';
+        $passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
         $timestamp = Carbon::rawParse('now')->format('YmdHms');
 
         $password = base64_encode($BusinessShortCode.$passkey.$timestamp);
