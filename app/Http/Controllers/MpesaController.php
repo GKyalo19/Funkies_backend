@@ -30,10 +30,11 @@ class MpesaController extends Controller
     }
 
     public function STKPush(){
-        $BusinessShortCode = 174379;
+        $access_token = $this->generateAccessToken();
 
+        $BusinessShortCode = 174379;
         $passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-        $timestamp = Carbon::rawParse('now')->format('YmdHms');
+        $timestamp = Carbon::rawParse('now')->format('YmdHis');
 
         $password = base64_encode($BusinessShortCode.$passkey.$timestamp);
 
@@ -45,7 +46,10 @@ class MpesaController extends Controller
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-Type:application/json',
+            'Authorization: Bearer'.$access_token
+        ]);
 
         $curl_post_data = array(
             'BusinessShortCode'=>$BusinessShortCode,
