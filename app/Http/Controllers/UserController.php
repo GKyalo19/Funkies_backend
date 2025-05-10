@@ -21,40 +21,15 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function store(Request $request): JsonResponse
-    {
-        $this->authorize('create', User::class);
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            // 'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            // 'role_id' => ['required', 'exists:roles,id'],
-        ]);
-
-        // if ($request->hasFile('user_photo')) {
-        //     $filename = $request->file('user_photo')->store('posts', 'public');
-        // } else {
-        //     $filename = Null;
-        // }
-
-        // $validated['user_photo'] = $filename;
-
-
-        $validated['password'] = Hash::make($validated['password']);
-        $user = User::create($validated);
-        return response()->json($user->load('role'), 201);
-    }
-
     public function showUsers(User $user): JsonResponse
     {
         // $this->authorize('view', $user);
         // Load the relationship and get the user data
         $userData = $user;
 
-        // $userData['user_photo_url'] = $user->user_photo
-        //     ?asset('storage/' . $user->user_photo)
-        //     :null;
+        $userData['user_photo_url'] = $user->user_photo
+            ? asset('storage/' . $user->user_photo)
+            : null;
 
         return response()->json($userData);
     }
@@ -63,12 +38,8 @@ class UserController extends Controller
     {
 
         $fetchedUser = User::findOrFail($id);
-
-        if ($fetchedUser->count() > 0) {
-            return response()->json([$fetchedUser], 200);
-        } else {
-            return "User was not Found for ID: $id";
-        }
+        
+        return response()->json($fetchedUser, 200);
     }
 
     public function updateUser(Request $request, $id)
@@ -82,7 +53,14 @@ class UserController extends Controller
                 'name' => ['sometimes', 'string', 'max:255'],
                 'email' => ['sometimes', 'string', 'email', 'max:255'],
                 'password' => ['sometimes', 'string', 'min:8'],
+                'user_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
+
+            if ($request->hasFile('user_photo')) {
+                $filename = $request->file('user_photo')->store('users', 'public');
+
+                $userToUpdate->user_photo = $filename;
+            }
 
             $userToUpdate->fill($validated);
 

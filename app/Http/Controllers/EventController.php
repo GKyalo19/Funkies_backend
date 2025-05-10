@@ -29,19 +29,33 @@ class EventController extends Controller
             'category' => 'required',
             'subject' => 'nullable',
             'name' => 'required|string|max:255',
-            'venue' => 'required|string|max:255',
+            'poster' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'participation_mode' => 'required|string|max:255',
+            'link' => 'nullable|string|max:255',
+            'venue' => 'nullable|string|max:255',
+            'county' => 'nullable|string|max:255',
             'description' => 'required|string',
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
             'hosts' => 'required|string',
             'sponsors' => 'nullable|string',
-            'capacity' => 'required|integer|min:1'
+            'capacity' => 'required|integer|min:1',
+            'registration_fee' => 'required|integer',
+            'currency' => 'required',
         ]);
 
         try {
             $authUser = Auth::user();
 
-            Log::info('Auth ID when creating event: ', ['user_id' => $authUser->id]);
+            // Log::info('Auth ID when creating event: ', ['user_id' => $authUser->id]);
+
+            if ($request->hasFile('poster')) {
+                $filename = $request->file('poster')->store('events', 'public');
+            } else {
+                $filename = Null;
+            }
+
+            $validated['poster'] = $filename;
 
             // Create the event and link it to the authenticated user
             $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
@@ -70,7 +84,7 @@ class EventController extends Controller
     {
         try {
             $event = Event::findOrFail($id);
-            return response()->json($event);
+            return new EventResource($event);
         } catch (\Exception $e) {
             return response()->json([
                 "error" => "Event was not found with id: " . $id
@@ -81,23 +95,36 @@ class EventController extends Controller
     public function editEvent(Request $request, $id)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'exists:users,id',
             'eventClass' => 'required',
             'level' => 'required',
             'category' => 'required',
             'subject' => 'nullable',
             'name' => 'required|string|max:255',
-            'venue' => 'required|string|max:255',
+            'poster' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'participation_mode' => 'required|string|max:255',
+            'link' => 'nullable|string|max:255',
+            'venue' => 'nullable|string|max:255',
+            'county' => 'nullable|string|max:255',
             'description' => 'required|string',
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
             'hosts' => 'required|string',
             'sponsors' => 'nullable|string',
-            'capacity' => 'required|integer',
+            'capacity' => 'required|integer|min:1',
+            'registration_fee' => 'required|integer',
+            'currency' => 'required',
         ]);
 
         try {
             $existingEvent = Event::findOrFail($id);
+
+            if ($request->hasFile('poster')) {
+                $filename = $request->file('poster')->store('events', 'public');
+            } else {
+                $filename = Null;
+            }
+            $existingEvent->poster = $filename;
 
             // Update event details
             $existingEvent->update($request->all());

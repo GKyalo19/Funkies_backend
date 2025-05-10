@@ -17,14 +17,20 @@ class Event extends Model
         'category',
         'subject',
         'name',
+        'poster',
+        'participation_mode',
         'venue',
+        'link',
+        'county',
         'description',
         'startDate',
         'endDate',
         'hosts',
         'sponsors',
         'capacity',
-        'user_id'
+        'registration_fee',
+        'currency',
+        'user_id',
     ];
 
     public function user()
@@ -50,5 +56,9 @@ class Event extends Model
         if (!$user) return false;
 
         return $user->likedEvents()->where('event_id', $this->id)->exists();
+    }
+
+    public function getEventPosterUrlAttribute(){
+        return $this->poster ? asset('storage/'. $this->poster):null;
     }
 }

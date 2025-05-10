@@ -52,9 +52,18 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'user_photo' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+
+        if ($request->hasFile('user_photo')) {
+            $filename = $request->file('user_photo')->store('users', 'public');
+        } else {
+            $filename = Null;
+        }
+
+        $validated['user_photo'] = $filename;
 
         //createUser
         $user = User::create($validated);

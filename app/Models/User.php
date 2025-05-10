@@ -17,7 +17,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        // 'user_photo',
+        'user_photo',
         // 'role_id',
         'is_active',
     ];
@@ -65,8 +65,10 @@ class User extends Authenticatable
         ];
     }
 
-    // public function getUserPhotoUrlAttribute()
-    // {
-    //     return $this->user_photo ? asset('storage/' . $this->user_photo) : null;
-    // }
+    protected $appends = ['user_photo_url']; 
+
+    public function getUserPhotoUrlAttribute()
+    {
+        return $this->user_photo ? asset('storage/' . $this->user_photo) : null;
+    }
 }
