@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class Event extends Model
 {
     use SoftDeletes;
-
+    
     protected $fillable = [
         'eventClass',
         'level',
