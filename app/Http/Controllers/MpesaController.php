@@ -24,7 +24,15 @@ class MpesaController extends Controller
 
         $curl_response = curl_exec($curl);
 
+        if (curl_errno($curl)) {
+            return response()->json(['error' => curl_error($curl)], 500);
+        }
+
         $access_token = json_decode($curl_response);
+
+        if (!isset($access_token->access_token)) {
+            return response()->json(['error' => 'Access token not generated', 'response' => $curl_response], 500);
+        }
 
         return $access_token->access_token;
     }
@@ -35,7 +43,7 @@ class MpesaController extends Controller
 
         $BusinessShortCode = 174379;
         $passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-        $timestamp = Carbon::rawParse('now')->format('YmdHis');
+        $timestamp = Carbon::now()->format('YmdHis');
 
         $password = base64_encode($BusinessShortCode.$passkey.$timestamp);
 
@@ -49,7 +57,7 @@ class MpesaController extends Controller
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type:application/json',
-            'Authorization: Bearer'.$access_token
+            'Authorization: Bearer '.$access_token
         ]);
 
         $curl_post_data = array(
@@ -61,7 +69,7 @@ class MpesaController extends Controller
             'PartyA'=>$PartyA,
             'PartyB'=>$PartyB,
             'PhoneNumber'=>$PartyA,
-            'CallBackURL'=>'https://funkies-backend.onrender.com/callback',
+            'CallBackURL'=>'https://funkies254-backend.onrender.com/callback',
             'AccountReference'=>'Funkies 254',
             'TransactionDesc'=>'Transaction successful!'
         );
@@ -74,6 +82,12 @@ class MpesaController extends Controller
 
         $curl_response = curl_exec($curl);
 
+        if (curl_errno($curl)) {
+            return response()->json(['error' => curl_error($curl)], 500);
+        }
+        curl_close($curl);
+
         return $curl_response;
+
     }
 }
