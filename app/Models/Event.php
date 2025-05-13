@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class Event extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'eventClass',
         'level',
@@ -41,6 +41,14 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'likes', 'event_id', 'user_id')->withTimestamps();
     }
+
+    public function paidUsers()
+    {
+        return $this->belongsToMany(User::class, 'event_user_payments')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
     protected $casts = [
         'startDate' => 'datetime',
         'endDate' => 'datetime',
@@ -58,7 +66,8 @@ class Event extends Model
         return $user->likedEvents()->where('event_id', $this->id)->exists();
     }
 
-    public function getEventPosterUrlAttribute(){
-        return $this->poster ? asset('storage/'. $this->poster):null;
+    public function getEventPosterUrlAttribute()
+    {
+        return $this->poster ? asset('storage/' . $this->poster) : null;
     }
 }

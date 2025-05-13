@@ -30,7 +30,8 @@ class EventResource extends JsonResource
             'registration_fee'=>$this->registration_fee,
             'currency'=>$this->currency,
             'userId' => $this->user_id,
-            'isLiked' => $this->is_liked, // This uses the accessor from your model
+            'isLiked' => $this->is_liked,
+            'isPaid' => $this->isPaid,
         ];
     }
 }

@@ -51,8 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('unlike/{id}', [LikeController::class, 'unlikeEvent']);
 
     //MPesa
-    Route::post('token', [MpesaController::class, 'generateAccessToken']);
     Route::post('stk/push', [MpesaController::class, 'STKPush']);
+    Route::post('mpesa/callback', [MpesaController::class, 'mpesaCallback']);
+    Route::get('payment/status/{event_id}', [MpesaController::class, 'checkPaymentStatus']);
+    Route::get('events/paid', [EventController::class, 'getPaidEvents']);
+    Route::get('events/upcoming/paid', [EventController::class, 'getUpcomingPaidEvents']);
 
     // Galleries
     Route::get('gallery', [GalleryController::class, 'getGalleries']);

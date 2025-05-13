@@ -43,6 +43,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'likes', 'user_id', 'event_id')->withTimestamps();
     }
 
+    public function paidEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_user_payments')
+            ->withPivot('status')
+            ->wherePivot('status', 'YES')
+            ->withTimestamps();
+    }
+
+
     public function isAdmin(): bool
     {
         // //Add debugging
@@ -65,7 +74,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected $appends = ['user_photo_url']; 
+    protected $appends = ['user_photo_url'];
 
     public function getUserPhotoUrlAttribute()
     {

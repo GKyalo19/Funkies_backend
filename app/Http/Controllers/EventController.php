@@ -92,6 +92,26 @@ class EventController extends Controller
         }
     }
 
+    public function getUpcomingPaidEvents()
+    {
+        $user = Auth::user();
+
+        $events = $user->paidEvents()
+            ->where('startDate', '>', now())
+            ->get();
+
+        return EventResource::collection($events);
+    }
+
+    public function getPaidEvents()
+    {
+        $user = Auth::user();
+
+        $events = $user->paidEvents()->get();
+
+        return EventResource::collection($events);
+    }
+
     public function editEvent(Request $request, $id)
     {
         $request->validate([
