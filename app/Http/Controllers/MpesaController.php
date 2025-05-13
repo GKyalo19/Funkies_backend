@@ -29,12 +29,12 @@ class MpesaController extends Controller
             ->where('status', 'YES')
             ->exists();
 
-            if ($alreadyPaid) {
-                return response()->json([
-                    'message' => 'You have already paid for this event',
-                    'status' => 'already_paid'
-                ], 200);
-            }
+        if ($alreadyPaid) {
+            return response()->json([
+                'message' => 'You have already paid for this event',
+                'status' => 'already_paid'
+            ], 200);
+        }
 
         # access token
         $consumerKey = 'K4RpCHURtlACH5yneIRcEp0KA1erkyNrnnVC7xLzCIqkNAMq'; //Fill with your app Consumer Key
@@ -42,7 +42,7 @@ class MpesaController extends Controller
 
         // Dynamic values
         $PartyA = $request->input('phone'); // This is your phone number,
-        $AccountReference = 'user'. $user->id . '_event' . $eventId;
+        $AccountReference = 'user' . $user->id . '_event' . $eventId;
         $TransactionDesc = $request->input('transaction_desc');
 
         //Static values
@@ -138,26 +138,59 @@ class MpesaController extends Controller
 
         $response = json_decode($data, true);
 
-        // Check if the transaction was successful
-        $resultCode = $response['Body']['stkCallback']['ResultCode'] ?? null;
+        $stkCallback = $response['Body']['stkCallback'] ?? null;
+        if (!$stkCallback) {
+            Log::error('Invalid M-Pesa callback payload');
+            return response()->json(['message' => 'Invalid payload'], 400);
+        }
+
+        $resultCode = $stkCallback['ResultCode'] ?? null;
+        $merchantRequestID = $stkCallback['MerchantRequestID'] ?? null;
+        $checkoutRequestID = $stkCallback['CheckoutRequestID'] ?? null;
 
         if ($resultCode === 0) {
-            // Transaction was successful
-            $accountReference = $response['Body']['stkCallback']['CallbackMetadata']['Item'][1]['Value'] ?? null;
+            $callbackItems = collect($stkCallback['CallbackMetadata']['Item']);
+            $mpesaReceipt = $callbackItems->firstWhere('Name', 'MpesaReceiptNumber')['Value'] ?? null;
+            $accountReference = $callbackItems->firstWhere('Name', 'AccountReference')['Value'] ?? null;
 
-            // Extract user_id and event_id from accountReference, e.g., format = user123_event456
+            // Ensure idempotency: Check if this receipt has already been processed
+            $existing = DB::table('mpesa_transactions')
+                ->where('mpesa_receipt', $mpesaReceipt)
+                ->first();
+
+            if ($existing) {
+                Log::info("Duplicate callback received for receipt: $mpesaReceipt");
+                return response()->json(['message' => 'Duplicate transaction'], 200);
+            }
+
+            // Parse user_id and event_id from AccountReference: e.g., user123_event456
             if (preg_match('/user(\d+)_event(\d+)/', $accountReference, $matches)) {
                 $userId = $matches[1];
                 $eventId = $matches[2];
 
+                // Record the transaction
                 DB::table('event_user_payments')->updateOrInsert(
                     ['user_id' => $userId, 'event_id' => $eventId],
                     ['status' => 'YES', 'updated_at' => now()]
                 );
 
+                // Save full transaction for audit/logging
+                DB::table('mpesa_transactions')->insert([
+                    'user_id' => $userId,
+                    'event_id' => $eventId,
+                    'merchant_request_id' => $merchantRequestID,
+                    'checkout_request_id' => $checkoutRequestID,
+                    'mpesa_receipt' => $mpesaReceipt,
+                    'amount' => $callbackItems->firstWhere('Name', 'Amount')['Value'] ?? null,
+                    'phone' => $callbackItems->firstWhere('Name', 'PhoneNumber')['Value'] ?? null,
+                    'transaction_time' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
                 Log::info("Payment updated successfully for user $userId and event $eventId");
 
-                return response()->json(['message' => 'Payment updated successfully']);
+                return response()->json(['message' => 'Payment processed successfully']);
             } else {
                 Log::error('Could not parse account reference: ' . $accountReference);
                 return response()->json(['message' => 'Failed to parse account reference'], 400);
@@ -167,6 +200,7 @@ class MpesaController extends Controller
             return response()->json(['message' => 'Transaction failed'], 400);
         }
     }
+
 
     public function checkPaymentStatus(Request $request)
     {
