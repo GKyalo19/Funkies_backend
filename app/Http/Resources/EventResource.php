@@ -29,6 +29,7 @@ class EventResource extends JsonResource
             'link'=>$this->link,
             'registration_fee'=>$this->registration_fee,
             'currency'=>$this->currency,
+            'contact_number'=>$this->contact_number,
             'userId' => $this->user_id,
             'isLiked' => $this->is_liked,
             'isPaid' => $this->isPaid,

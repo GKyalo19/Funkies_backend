@@ -42,6 +42,7 @@ class EventController extends Controller
             'capacity' => 'required|integer|min:1',
             'registration_fee' => 'required|integer',
             'currency' => 'required',
+            'contact_number' => 'required|integer',
         ]);
 
         try {
@@ -67,7 +68,10 @@ class EventController extends Controller
                 $user->notify(new EventNotification($event));
             }
 
-            Mail::to($authUser->email)->send(new EventCreatedConfirmation($event));
+            //Email for new event
+            foreach ($users as $user) {
+                Mail::to($user->email)->send(new EventCreatedConfirmation($event));
+            }
 
             return response()->json(['message' => 'Event created and notifications sent!'], 201);
         } catch (\Exception $e) {
@@ -134,6 +138,7 @@ class EventController extends Controller
             'capacity' => 'required|integer|min:1',
             'registration_fee' => 'required|integer',
             'currency' => 'required',
+            'contact_number' => 'required|integer',
         ]);
 
         try {

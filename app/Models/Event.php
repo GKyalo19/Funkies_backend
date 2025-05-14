@@ -30,8 +30,17 @@ class Event extends Model
         'capacity',
         'registration_fee',
         'currency',
+        'contact_number',
         'user_id',
     ];
+
+
+    protected $appends = ['isLiked', 'poster_url'];
+
+    public function getEventPosterUrlAttribute()
+    {
+        return $this->poster ? asset('storage/' . $this->poster) : null;
+    }
 
     public function user()
     {
@@ -40,6 +49,14 @@ class Event extends Model
     public function likedByUsers()
     {
         return $this->belongsToMany(User::class, 'likes', 'event_id', 'user_id')->withTimestamps();
+    }
+
+    public function getIsLikedAttribute()
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+
+        return $user->likedEvents()->where('event_id', $this->id)->exists();
     }
 
     public function paidUsers()
@@ -54,20 +71,7 @@ class Event extends Model
         'endDate' => 'datetime',
     ];
 
-    protected $appends = ['isLiked'];
-
     protected $hidden = []; // optionally hide pivot data
 
-    public function getIsLikedAttribute()
-    {
-        $user = Auth::user();
-        if (!$user) return false;
 
-        return $user->likedEvents()->where('event_id', $this->id)->exists();
-    }
-
-    public function getEventPosterUrlAttribute()
-    {
-        return $this->poster ? asset('storage/' . $this->poster) : null;
-    }
 }

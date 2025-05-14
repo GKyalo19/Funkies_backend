@@ -18,9 +18,15 @@ class User extends Authenticatable
         'email',
         'password',
         'user_photo',
-        // 'role_id',
         'is_active',
     ];
+
+    protected $appends = ['user_photo_url'];
+
+    public function getUserPhotoUrlAttribute()
+    {
+        return $this->user_photo ? asset('storage/' . $this->user_photo) : null;
+    }
 
     protected $hidden = [
         'password',
@@ -49,35 +55,5 @@ class User extends Authenticatable
             ->withPivot('status')
             ->wherePivot('status', 'YES')
             ->withTimestamps();
-    }
-
-
-    public function isAdmin(): bool
-    {
-        // //Add debugging
-        // \Log::info('isAdmin check:', [
-        //     'user_id' => $this->id,
-        //     'role_id' => $this->role_id,
-        //     'is_admin' => $this->role_id === 1  // or whatever your admin role ID is
-        // ]);
-
-        return $this->role_id === 1; // adjust based on your admin role ID
-    }
-
-    public function abilities()
-    {
-        // Implement based on your requirements
-        return [
-            'view-dashboard' => $this->can('view-dashboard'),
-            'manage-users' => $this->can('manage-users'),
-            'update-users' => $this->can('update-users', $this),
-        ];
-    }
-
-    protected $appends = ['user_photo_url'];
-
-    public function getUserPhotoUrlAttribute()
-    {
-        return $this->user_photo ? asset('storage/' . $this->user_photo) : null;
     }
 }

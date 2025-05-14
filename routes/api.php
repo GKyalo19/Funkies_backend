@@ -22,21 +22,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
+
+    // Users
+    Route::get('user', [UserController::class, 'index']);
+    Route::post('user', [UserController::class, 'store']);
+    Route::get('user/{id}', [UserController::class, 'getUser']);
+    Route::put('user/{id}', [UserController::class, 'updateUser']);
+    Route::delete('user/{id}',[UserController::class, 'deleteUser']);
+    Route::post('/restore-user/{email}', [UserController::class, 'restoreUser']);
+
     // Notifications
     Route::get('/user/notifications', function(){
         return response()->json(Auth::user()->unreadNotifications);
     });
     Route::get('/notifications', [NotificationController::class, 'getNotifications']);
     Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
-
-    // Users
-    Route::get('user', [UserController::class, 'index']);
-    Route::post('user', [UserController::class, 'store']);
-    // Route::get('user/{id}', [UserController::class, 'showUsers']);
-    Route::get('user/{id}', [UserController::class, 'getUser']);
-    Route::put('user/{id}', [UserController::class, 'updateUser']);
-    Route::delete('user/{id}',[UserController::class, 'deleteUser']);
-    Route::post('/restore-user/{email}', [UserController::class, 'restoreUser']);
 
     // Events
     Route::get('event', [EventController::class, 'index']);
