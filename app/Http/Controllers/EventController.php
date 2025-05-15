@@ -7,6 +7,7 @@ use App\Mail\EventCreatedConfirmation;
 use App\Models\Event;
 use App\Models\User;
 use App\Notifications\EventNotification;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -47,15 +48,11 @@ class EventController extends Controller
 
         try {
             $authUser = Auth::user();
-
-            // Log::info('Auth ID when creating event: ', ['user_id' => $authUser->id]);
-
             if ($request->hasFile('poster')) {
                 $filename = $request->file('poster')->store('events', 'public');
             } else {
                 $filename = Null;
             }
-
             $validated['poster'] = $filename;
 
             // Create the event and link it to the authenticated user
@@ -164,17 +161,20 @@ class EventController extends Controller
 
     public function deleteEvent($id)
     {
-        try {
-            $existingEvent = Event::findOrFail($id);
-            $existingEvent->delete();
+        $eventToDelete = Event::findorFail($id);
 
-            return response()->json([
-                "deleted" => $existingEvent
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                "error" => "Event could not be deleted!"
-            ], 403);
+        if ($eventToDelete) {
+            try {
+                $eventToDelete = Event::destroy($id);
+                return "Event deleted successfully";
+            } catch (Exception $e) {
+                return response()->json([
+                    "Error" => "Failed to delete event",
+                    "Message" => $e->getMessage()
+                ], 500);
+            }
+        } else {
+            return "Event not found";
         }
     }
 }

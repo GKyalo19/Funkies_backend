@@ -38,7 +38,7 @@ class UserController extends Controller
     {
 
         $fetchedUser = User::findOrFail($id);
-        
+
         return response()->json($fetchedUser, 200);
     }
 
@@ -126,10 +126,3 @@ class UserController extends Controller
     }
 }
 
-
-        // if ($request->hasFile('user_photo')) {
-        //     $filename = $request->file('user_photo')->store('posts', 'public');
-        // } else {
-        //     $filename = Null;
-        // }
-        // $user->user_photo = $filename;

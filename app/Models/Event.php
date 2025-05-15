@@ -34,10 +34,7 @@ class Event extends Model
         'user_id',
     ];
 
-
-    protected $appends = ['isLiked', 'poster_url'];
-
-    public function getEventPosterUrlAttribute()
+    public function getPosterUrlAttribute()
     {
         return $this->poster ? asset('storage/' . $this->poster) : null;
     }
@@ -51,6 +48,8 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'likes', 'event_id', 'user_id')->withTimestamps();
     }
 
+    protected $appends = ['isLiked', 'posterUrl'];
+
     public function getIsLikedAttribute()
     {
         $user = Auth::user();
@@ -58,6 +57,15 @@ class Event extends Model
 
         return $user->likedEvents()->where('event_id', $this->id)->exists();
     }
+
+    public function getIsPaidAttribute()
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+
+        return $this->paidUsers()->where('user_id', $user->id)->exists();
+    }
+
 
     public function paidUsers()
     {

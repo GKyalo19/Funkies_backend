@@ -43,7 +43,6 @@ class LikeController extends Controller
 
     public function getLikedEvents(){
         $user = Auth::user();
-
         try {
             $likedEvents = $user->likedEvents()->get()->map(function ($event){
                 $event -> isLiked = true;
@@ -56,7 +55,6 @@ class LikeController extends Controller
                 'error'=>'No available liked events'.$e
             ]);
         }
-
     }
 
     public function unLikeEvent($id){
