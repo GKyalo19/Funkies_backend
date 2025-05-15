@@ -13,7 +13,6 @@ class EventCreatedConfirmation extends Mailable
     use Queueable, SerializesModels;
 
     public $event;
-
     public function __construct($event)
     {
         $this->event = $event;
@@ -25,21 +24,17 @@ class EventCreatedConfirmation extends Mailable
             subject: 'Event creation success!',
         );
     }
-
     public function content(): Content
     {
         return new Content(
             view: 'emails.event_created' // Correct view path
         );
     }
-
-
     public function build()
     {
         return $this->subject('Your Event Has Been Created!')
                     ->view('emails.event_created');
     }
-
     public function attachments(): array
     {
         return [];

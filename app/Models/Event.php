@@ -48,7 +48,7 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'likes', 'event_id', 'user_id')->withTimestamps();
     }
 
-    protected $appends = ['isLiked', 'posterUrl'];
+    protected $appends = ['isLiked', 'posterUrl', 'isPaid'];
 
     public function getIsLikedAttribute()
     {
