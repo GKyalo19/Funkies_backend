@@ -17,7 +17,8 @@ class MpesaController extends Controller
         $request->validate([
             'phone' => 'required|string',
             'event_id' => 'required|exists:events,id',
-            'transaction_desc' => 'required|string'
+            'transaction_desc' => 'required|string',
+            'event_name'=>'required|string'
         ]);
 
         $user = Auth::user();
@@ -42,7 +43,7 @@ class MpesaController extends Controller
 
         // Dynamic values
         $PartyA = $request->input('phone'); // This is your phone number,
-        $AccountReference = 'user' . $user->id . '_event' . $eventId;
+        $AccountReference = $request->input('event_name');
         $TransactionDesc = $request->input('transaction_desc');
 
         //Static values

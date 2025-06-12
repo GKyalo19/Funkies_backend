@@ -59,16 +59,16 @@ class EventController extends Controller
             $event = Event::create(array_merge($validated, ['user_id' => $authUser->id]));
 
             // Notify all users
-            $users = User::all();
+            // $users = User::all();
 
-            foreach ($users as $user) {
-                $user->notify(new EventNotification($event));
-            }
+            // foreach ($users as $user) {
+            //     $user->notify(new EventNotification($event));
+            // }
 
             //Email for new event
-            foreach ($users as $user) {
-                Mail::to($user->email)->send(new EventCreatedConfirmation($event));
-            }
+            // foreach ($users as $user) {
+            //     Mail::to($user->email)->send(new EventCreatedConfirmation($event));
+            // }
 
             return response()->json(['message' => 'Event created and notifications sent!'], 201);
         } catch (\Exception $e) {
@@ -117,25 +117,25 @@ class EventController extends Controller
     {
         $request->validate([
             'user_id' => 'exists:users,id',
-            'eventClass' => 'required',
-            'level' => 'required',
-            'category' => 'required',
-            'subject' => 'nullable',
-            'name' => 'required|string|max:255',
+            'eventClass' => 'sometimes',
+            'level' => 'sometimes',
+            'category' => 'sometimes',
+            'subject' => 'sometimes',
+            'name' => 'sometimes|string|max:255',
             'poster' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'participation_mode' => 'required|string|max:255',
-            'link' => 'nullable|string|max:255',
-            'venue' => 'nullable|string|max:255',
-            'county' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'startDate' => 'required|date',
-            'endDate' => 'required|date|after_or_equal:startDate',
-            'hosts' => 'required|string',
-            'sponsors' => 'nullable|string',
-            'capacity' => 'required|integer|min:1',
-            'registration_fee' => 'required|integer',
-            'currency' => 'required',
-            'contact_number' => 'required|integer',
+            'participation_mode' => 'sometimes|string|max:255',
+            'link' => 'sometimes|string|max:255',
+            'venue' => 'sometimes|string|max:255',
+            'county' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'startDate' => 'sometimes|date',
+            'endDate' => 'sometimes|date|after_or_equal:startDate',
+            'hosts' => 'sometimes|string',
+            'sponsors' => 'sometimes|string',
+            'capacity' => 'sometimes|integer|min:1',
+            'registration_fee' => 'sometimes|integer',
+            'currency' => 'sometimes',
+            'contact_number' => 'sometimes|integer',
         ]);
 
         try {
